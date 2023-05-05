@@ -1,5 +1,6 @@
 import App from "./App.svelte";
-import "./tailwind.css"; // don't know why not working
+
+import "./style.css";
 
 let data = {
   "": {
