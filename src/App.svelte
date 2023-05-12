@@ -1,6 +1,5 @@
 <script>
   import { onMount } from "svelte";
-
   export let data;
 
   let l = data[""].label[""];
@@ -14,7 +13,6 @@
     }
     return `${q.currency} ${number.toLocaleString(undefined, {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
     })}`;
   };
   const qty = (number) => {
@@ -22,7 +20,9 @@
     if (number === 0 || isNaN(number)) {
       return "";
     }
-    return number;
+    return number.toLocaleString(undefined, {
+      minimumFractionDigits: 0,
+    });
   };
   const rate = (rate) => {
     rate = Number(rate) * 100;
@@ -91,7 +91,7 @@
         q.lang = lng;
       }}
     >
-      {lng == "th" ? "ไทย" : "Eng"}
+      {data[lng]['']}
     </button>
   {/each}
   {#each Object.keys(data[q.lang].label) as dc, i (`doc-${i}`)}
