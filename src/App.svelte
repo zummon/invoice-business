@@ -1,12 +1,9 @@
 <script>
 	import { onMount } from "svelte";
-	import data from "./data.json";
 
-	// "ref": Math.random().toString().slice(2, 10),
-	// "date": new Date().toLocaleDateString(undefined),
+	export let data;
 
 	let l = data[""].label[""];
-	// query
 	let q = data[""].q;
 
 	const price = (number) => {
@@ -14,7 +11,7 @@
 		if (number === 0 || isNaN(number)) {
 			return "";
 		}
-		return `${q.currency} ${number.toLocaleString(undefined, {
+		return `${q.currency} ${number.toLocaleString(q.lang, {
 			minimumFractionDigits: 2,
 		})}`;
 	};
@@ -23,7 +20,7 @@
 		if (number === 0 || isNaN(number)) {
 			return "";
 		}
-		return number.toLocaleString(undefined, {
+		return number.toLocaleString(q.lang, {
 			minimumFractionDigits: 0,
 		});
 	};
@@ -61,6 +58,12 @@
 			}
 		});
 		q = { ...data[q.lang].q, ...obj };
+		if (!q.ref) {
+			q.ref = Math.random().toString().slice(2, 10);
+		}
+		if (!q.date) {
+			q.date = new Date().toLocaleDateString();
+		}
 	});
 
 	$: l = {
@@ -77,11 +80,7 @@
 	}, 0);
 	$: q.totalVat = Number(q.totalAmount) * Number(q.vatRate);
 	$: q.totalWht = Number(q.totalAmount) * Number(q.whtRate);
-	$: q.totalFinal =
-		Number(q.totalAmount) +
-		Number(q.totalVat) +
-		Number(q.totalWht) +
-		Number(q.totalAdjust);
+	$: q.totalFinal = Number(q.totalAmount) + Number(q.totalVat) + Number(q.totalWht) + Number(q.totalAdjust);
 </script>
 
 <div class="flex flex-wrap justify-center items-center my-4 print:hidden">
@@ -111,53 +110,20 @@
 	{/each}
 </div>
 
-<div
-	class="font-sans bg-white text-black p-4 max-w-[60rem] mx-auto print:max-w-none print:mx-0"
->
+<div class="max-w-5xl mx-auto print:max-w-none print:mx-0">
 	<div class="grid grid-cols-2 gap-4 mb-3">
 		<div class="my-auto">
-			<div class="" on:click={() => {}}>
-				<img class="mb-3" src={q.vendorLogo} alt="" width="" height="" />
-			</div>
-			<h3
-				class="text-xl mb-1"
-				contenteditable="true"
-				bind:textContent={q.vendorName}
-			/>
-			<p
-				class="ml-3 mb-1"
-				contenteditable="true"
-				bind:textContent={q.vendorId}
-			/>
-			<p
-				class="ml-3 mb-6"
-				contenteditable="true"
-				bind:textContent={q.vendorAddress}
-			/>
+			<img class="mb-3" src={q.vendorLogo} alt="" width="" height="" />
+			<h3 class="text-xl mb-1" contenteditable="true" bind:textContent={q.vendorName} />
+			<p class="ml-3 mb-1" contenteditable="true" bind:textContent={q.vendorId} />
+			<p class="ml-3 mb-6" contenteditable="true" bind:textContent={q.vendorAddress} />
 			<h4 class="mb-1">{l.client}</h4>
-			<h3
-				class="text-xl mb-1"
-				contenteditable="true"
-				bind:textContent={q.clientName}
-			/>
-			<p
-				class="ml-3 mb-1"
-				contenteditable="true"
-				bind:textContent={q.clientId}
-			/>
-			<p
-				class="ml-3 mb-3"
-				contenteditable="true"
-				bind:textContent={q.clientAddress}
-			/>
+			<h3 class="text-xl mb-1" contenteditable="true" bind:textContent={q.clientName} />
+			<p class="ml-3 mb-1" contenteditable="true" bind:textContent={q.clientId} />
+			<p class="ml-3 mb-3" contenteditable="true" bind:textContent={q.clientAddress} />
 			<h4 class="">
 				<span class="font-bold">{l.subject}</span>
-				<span class="" />
-				<span
-					class="text-lg text-blue-500"
-					contenteditable="true"
-					bind:textContent={q.subject}
-				/>
+				<span class="text-lg text-blue-500" contenteditable="true" bind:textContent={q.subject} />
 			</h4>
 		</div>
 		<div class="my-auto">
@@ -167,22 +133,13 @@
 			<div class="bg-gray-50 px-3 py-6 mb-3">
 				{#if q.doc !== "receipt"}
 					<h4 class="mb-1">{l.duedate}</h4>
-					<p
-						class="px-2 py-0.5 border bg-white mb-1"
-						contenteditable="true"
-						bind:textContent={q.duedate}
-					/>
+					<p class="px-2 py-0.5 border bg-white mb-1" contenteditable="true" bind:textContent={q.duedate} />
 				{/if}
 				<h4 class="mb-1">{l.paymethod}</h4>
-				<p
-					class="px-2 py-0.5 border bg-white"
-					contenteditable="true"
-					bind:textContent={q.paymethod}
-				/>
+				<p class="px-2 py-0.5 border bg-white" contenteditable="true" bind:textContent={q.paymethod} />
 			</div>
 			<h4 class="text-right">
 				<span class="font-bold">{l.totalFinal}</span>
-				<span class="" />
 				<span class="text-lg text-blue-500">
 					{price(q.totalFinal)}
 				</span>
@@ -201,15 +158,8 @@
 							on:click={addItem}
 						>
 							<!-- heroicons solid duplicate -->
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-6 w-6"
-								viewBox="0 0 20 20"
-								fill="currentColor"
-							>
-								<path
-									d="M7 9a2 2 0 012-2h6a2 2 0 012 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2V9z"
-								/>
+							<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+								<path d="M7 9a2 2 0 012-2h6a2 2 0 012 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2V9z" />
 								<path d="M5 3a2 2 0 00-2 2v6a2 2 0 002 2V5h8a2 2 0 00-2-2H5z" />
 							</svg>
 						</button>
@@ -218,12 +168,7 @@
 							on:click={removeItem}
 						>
 							<!-- heroicons solid trash 	-->
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-6 w-6"
-								viewBox="0 0 20 20"
-								fill="currentColor"
-							>
+							<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
 								<path
 									fill-rule="evenodd"
 									d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
@@ -241,14 +186,8 @@
 		<tbody class="">
 			{#each q.itemDesc as _, i (`item-${i}`)}
 				<tr class="border-b">
-					<td class="py-1 px-2 whitespace-nowrap" contenteditable="true"
-						>{i + 1}</td
-					>
-					<td
-						class="py-1 px-2"
-						contenteditable="true"
-						bind:textContent={q.itemDesc[i]}
-					/>
+					<td class="py-1 px-2 whitespace-nowrap" contenteditable="true">{i + 1}</td>
+					<td class="py-1 px-2" contenteditable="true" bind:textContent={q.itemDesc[i]} />
 					<td
 						class="py-1 px-2 text-right whitespace-nowrap"
 						contenteditable="true"
@@ -287,15 +226,10 @@
 						<p class="px-2 py-0.5 border bg-white" contenteditable="true">
 							<br /><br />
 						</p>
-						<p
-							class="px-2 py-0.5 mb-3 border-b border-r border-l bg-white"
-							contenteditable="true"
-						/>
+						<p class="px-2 py-0.5 mb-3 border-b border-r border-l bg-white" contenteditable="true" />
 					</div>
 				</td>
-				<td class="py-1 px-2 border-b whitespace-nowrap" colspan="2"
-					>{l.totalAmount}</td
-				>
+				<td class="py-1 px-2 border-b whitespace-nowrap" colspan="2">{l.totalAmount}</td>
 				<td class="py-1 px-2 border-b text-right whitespace-nowrap">
 					{price(q.totalAmount)}
 				</td>
@@ -339,9 +273,7 @@
 				</tr>
 			{/if}
 			<tr class="">
-				<td class="py-1 px-2 border-b whitespace-nowrap" colspan="2"
-					>{l.totalAdjust}</td
-				>
+				<td class="py-1 px-2 border-b whitespace-nowrap" colspan="2">{l.totalAdjust}</td>
 				<td
 					class="py-1 px-2 border-b text-right whitespace-nowrap"
 					contenteditable="true"
@@ -363,10 +295,7 @@
 		<div class="">
 			<h4 class="mb-1 mt-3">{l.vendorSign}</h4>
 			<p class="px-2 py-0.5 border" contenteditable="true"><br /><br /></p>
-			<p
-				class="px-2 py-0.5 mb-3 border-b border-r border-l"
-				contenteditable="true"
-			/>
+			<p class="px-2 py-0.5 mb-3 border-b border-r border-l" contenteditable="true" />
 		</div>
 	</div>
 </div>
@@ -375,13 +304,13 @@
 	<label class="">
 		<span class="">Currency</span>
 		<input class="border border-blue-500 w-12" bind:value={q.currency} />
-		<label>
-			<button
-				class="block font-bold duration-300 p-2 text-gray-100 bg-blue-500 hover:bg-gray-100 focus:bg-gray-100 hover:text-gray-900 focus:text-gray-900"
-				on:click={() => window.print()}
-			>
-				Print
-			</button>
-		</label></label
-	>
+	</label>
+	<label>
+		<button
+			class="block font-bold duration-300 p-2 text-gray-100 bg-blue-500 hover:bg-gray-100 focus:bg-gray-100 hover:text-gray-900 focus:text-gray-900"
+			onclick="print()"
+		>
+			Print
+		</button>
+	</label>
 </div>
